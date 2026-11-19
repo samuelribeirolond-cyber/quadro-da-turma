@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quadro da Turma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --papel: #f1f4fb; --grade: rgba(27,59,209,.075); --card: #ffffff; --texto: #14183a; --suave: #5a6086;
+  --linha: #d9deee; --tinta: #1b3bd1; --tinta-fundo: #e6ebff; --sobre-tinta: #ffffff;
+  --marca: #ffe14d; --corretor: #d62839; --verde: #168a5b; --laranja: #e8590c; --laranja-fundo: #ffe9dc;
+  --sombra: 0 1px 0 rgba(20,24,58,.06), 0 6px 18px -8px rgba(20,24,58,.18);
+  --display: 'Bricolage Grotesque', 'Trebuchet MS', system-ui, sans-serif;
+  --corpo: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --papel: #0e1130; --grade: rgba(140,160,255,.08); --card: #171b47; --texto: #eef0ff; --suave: #a2a8d6;
+    --linha: #2b3070; --tinta: #8ea2ff; --tinta-fundo: #232a6e; --sobre-tinta: #0e1130;
+    --marca: #ffe14d; --corretor: #ff6b78; --verde: #46d39a; --laranja: #ff9a5c; --laranja-fundo: #3d2a22;
+    --sombra: 0 1px 0 rgba(0,0,0,.3), 0 8px 20px -10px rgba(0,0,0,.6);
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; font-family: var(--corpo); font-size: 16px; line-height: 1.45; color: var(--texto);
+  background-color: var(--papel);
+  background-image: linear-gradient(var(--grade) 1px, transparent 1px), linear-gradient(90deg, var(--grade) 1px, transparent 1px);
+  background-size: 26px 26px; min-height: 100vh;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--tinta); outline-offset: 2px; border-radius: 6px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; margin: 0; letter-spacing: -.01em; }
+.sr { position: absolute; left: -9999px; }
+
+.topo { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--papel) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1.5px solid var(--linha); }
+.topo-in { max-width: 1120px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 14px; }
+.logo { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: -.02em; background: linear-gradient(transparent 58%, var(--marca) 58%, var(--marca) 90%, transparent 90%); padding: 0 4px; border-radius: 2px; color: #14183a; white-space: nowrap; }
+.nav { display: flex; gap: 4px; margin-left: 12px; flex: 1; }
+.nav button { border: 0; background: none; padding: 8px 12px; border-radius: 999px; font-weight: 600; color: var(--suave); display: flex; gap: 6px; align-items: center; }
+.nav button:hover { background: var(--tinta-fundo); color: var(--tinta); }
+.nav button[aria-current="page"] { background: var(--tinta); color: var(--sobre-tinta); }
+.eu { margin-left: auto; display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--linha); background: var(--card); border-radius: 999px; padding: 4px 12px 4px 4px; font-weight: 600; white-space: nowrap; }
+.av { width: 28px; height: 28px; border-radius: 50%; color: #fff; display: inline-grid; place-items: center; font-weight: 700; font-size: 13px; flex: none; }
+.av.sm { width: 22px; height: 22px; font-size: 11px; }
+.app { max-width: 1120px; margin: 0 auto; padding: 22px 16px 110px; }
+
+@media (max-width: 760px) {
+  .topo { backdrop-filter: none; background: var(--papel); }
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0; background: var(--card); border-top: 1.5px solid var(--linha); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); justify-content: space-around; z-index: 30; }
+  .nav button { flex-direction: column; gap: 0; font-size: 11px; padding: 4px 6px; border-radius: 10px; min-width: 0; }
+  .nav button .ic { font-size: 20px; }
+  .eu span.nm { display: none; }
+  .eu { padding: 4px; }
+}
+@media (min-width: 761px) { .nav .ic { font-size: 16px; } }
+
+.titulo-pg { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 16px; margin-bottom: 18px; }
+.titulo-pg h1 { font-size: clamp(28px, 5vw, 44px); font-weight: 800; }
+.titulo-pg .sub { color: var(--suave); margin-top: 4px; }
+.titulo-pg .acoes { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { border: 1.5px solid var(--tinta); background: var(--tinta); color: var(--sobre-tinta); padding: 9px 16px; border-radius: 999px; font-weight: 700; display: inline-flex; gap: 6px; align-items: center; }
+.btn:hover { filter: brightness(1.08); }
+.btn.sec { background: transparent; color: var(--tinta); }
+.btn.perigo { background: transparent; color: var(--corretor); border-color: var(--corretor); }
+.btn.mini { padding: 4px 10px; font-size: 14px; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.card { background: var(--card); border: 1.5px solid var(--linha); border-radius: var(--r); box-shadow: var(--sombra); padding: 14px 16px; }
+.vazio { border: 2px dashed var(--linha); border-radius: var(--r); padding: 22px; color: var(--suave); text-align: center; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1.5px solid var(--linha); background: var(--card); padding: 5px 12px; border-radius: 999px; font-weight: 600; font-size: 14px; color: var(--suave); }
+.chip[aria-pressed="true"] { background: var(--texto); color: var(--card); border-color: var(--texto); }
+.tag { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--tinta-fundo); color: var(--tinta); white-space: nowrap; }
+.tag.fora { background: var(--laranja-fundo); color: var(--laranja); }
+.tag.vis { background: transparent; border: 1.5px dashed var(--linha); color: var(--suave); }
+.muted { color: var(--suave); font-size: 14px; }
+.row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.inicio-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+.inicio-grid h2 { font-size: 20px; margin-bottom: 10px; }
+.lista { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.lista li { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--linha); }
+.lista li:last-child { border-bottom: 0; }
+.lista button.link { background: none; border: 0; padding: 0; text-align: left; font-weight: 600; }
+.lista button.link:hover { color: var(--tinta); text-decoration: underline; }
+.data-pill { font-size: 13px; font-weight: 700; color: var(--suave); white-space: nowrap; }
+.data-pill.atraso { color: var(--corretor); }
+.data-pill.hoje { background: var(--marca); color: #14183a; padding: 1px 8px; border-radius: 4px; }
+
+.quadro { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
+@media (max-width: 900px) { .quadro { grid-template-columns: 1fr; } }
+.coluna { background: color-mix(in srgb, var(--card) 55%, transparent); border: 1.5px dashed var(--linha); border-radius: var(--r); padding: 10px; display: grid; gap: 10px; }
+.coluna > h2 { font-size: 17px; display: flex; align-items: center; gap: 8px; padding: 2px 4px; }
+.coluna > h2 .n { font-family: var(--corpo); font-size: 13px; background: var(--card); border: 1.5px solid var(--linha); border-radius: 999px; padding: 0 8px; color: var(--suave); }
+.tarefa { text-align: left; width: 100%; position: relative; padding-left: 18px; }
+.tarefa::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 5px; border-radius: 0 4px 4px 0; background: var(--tinta); }
+.tarefa.fora::before { background: var(--laranja); }
+.tarefa.feito { opacity: .7; }
+.tarefa.feito .t { text-decoration: line-through; }
+.tarefa .t { font-weight: 700; display: block; margin-bottom: 6px; overflow-wrap: anywhere; }
+.tarefa .mv { display: flex; gap: 6px; margin-top: 10px; }
+
+.agenda { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .agenda { grid-template-columns: 1fr; } }
+.mes-cab { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.mes-cab h2 { font-size: 24px; text-transform: capitalize; }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal .sem { text-align: center; font-size: 12px; font-weight: 700; color: var(--suave); padding-bottom: 2px; }
+.dia { aspect-ratio: 1 / 1; min-height: 44px; border: 1.5px solid var(--linha); background: var(--card); border-radius: 10px; padding: 4px 6px; display: flex; flex-direction: column; justify-content: space-between; text-align: left; font-weight: 600; }
+.dia.hoje { border-color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--tinta); }
+.dia[aria-pressed="true"] { background: var(--tinta); color: var(--sobre-tinta); border-color: var(--tinta); }
+.pts { display: flex; gap: 3px; flex-wrap: wrap; }
+.pt { width: 8px; height: 8px; border-radius: 50%; background: var(--tinta); }
+.pt.tf { background: var(--marca); box-shadow: 0 0 0 1.5px #14183a; }
+.dia[aria-pressed="true"] .pt { background: var(--sobre-tinta); }
+.ev-item { padding: 10px 0; border-bottom: 1px dashed var(--linha); display: grid; gap: 2px; }
+.ev-item:last-child { border: 0; }
+.ev-item button.link { background: none; border: 0; padding: 0; font-weight: 700; text-align: left; }
+
+.mural { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.aviso { display: grid; gap: 8px; align-content: start; }
+.aviso.fixado { background: var(--marca); color: #14183a; border-color: #14183a; }
+.aviso.fixado .muted { color: #3b3f66; }
+.aviso h3 { font-size: 20px; overflow-wrap: anywhere; }
+.aviso p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.links { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.links a.alvo { font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--tinta); text-decoration: none; overflow-wrap: anywhere; }
+.links a.alvo:hover { text-decoration: underline; }
+
+.overlay { position: fixed; inset: 0; background: rgba(10,12,40,.55); z-index: 100; display: grid; place-items: center; padding: 14px; overflow-y: auto; }
+.modal { background: var(--card); border: 1.5px solid var(--linha); border-radius: 18px; width: min(560px, 100%); max-height: calc(100vh - 28px); overflow-y: auto; padding: 20px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.5); }
+.modal.larga { width: min(720px, 100%); }
+.modal h2 { font-size: 26px; margin-bottom: 14px; }
+.campo { display: grid; gap: 4px; margin-bottom: 12px; }
+.campo > label, .campo > .rot { font-weight: 700; font-size: 14px; }
+.campo input[type=text], .campo input[type=password], .campo input[type=date], .campo input[type=time], .campo input[type=number], .campo input[type=url], .campo select, .campo textarea, .in {
+  width: 100%; border: 1.5px solid var(--linha); background: var(--papel); border-radius: 10px; padding: 9px 12px; min-height: 44px;
+}
+.campo textarea { min-height: 90px; resize: vertical; }
+.campo .dica { font-size: 13px; color: var(--suave); }
+.duas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 520px) { .duas { grid-template-columns: 1fr; } }
+.check { display: flex; gap: 8px; align-items: center; font-weight: 500; }
+.check input { width: 20px; height: 20px; accent-color: var(--tinta); flex: none; }
+.vis { border: 1.5px dashed var(--linha); border-radius: 12px; padding: 10px 12px; margin: 0 0 12px; }
+.vis legend { font-weight: 700; font-size: 14px; padding: 0 6px; }
+.vis-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; margin: 8px 0 0 28px; }
+.rodape { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 6px; }
+.rodape .esq { margin-right: auto; }
+.erro { color: var(--corretor); font-weight: 600; margin: 0 0 10px; min-height: 0; }
+#toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); background: var(--texto); color: var(--card); padding: 10px 18px; border-radius: 999px; font-weight: 600; z-index: 200; box-shadow: var(--sombra); max-width: 90vw; }
+#toast.erro-t { background: var(--corretor); color: #fff; }
+
+.login { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+.login .card { width: min(400px, 100%); padding: 26px; }
+.login h1 { font-size: 34px; margin: 10px 0 4px; }
+
+.pessoas { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.pessoa { display: grid; gap: 10px; }
+.pessoa header { display: flex; gap: 10px; align-items: center; }
+.pessoa .nm { font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.1; }
+.perm-grade { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; }
+.perm-grade select { min-height: 40px; border: 1.5px solid var(--linha); background: var(--papel); border-radius: 10px; padding: 6px 10px; }
+.p-tag { font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1.5px solid var(--linha); color: var(--suave); }
+.p-tag.on { border-color: var(--verde); color: var(--verde); }
+.p-tag.ed { background: var(--verde); color: #fff; border-color: var(--verde); }
+
+/* ===== RPG novo ===== */
+#rpg-area { --papel:#17101f; --card:#261a33; --linha:#473558; --tinta:#e9b44c; --texto:#f4ead2; --suave:#b9a98f; --sobre:#1a1020;
+  background-color: var(--papel); color: var(--texto); border-radius: 20px; padding: 16px; border: 1.5px solid var(--linha);
+  background-image: radial-gradient(900px 380px at 12% -8%, color-mix(in srgb, var(--tinta) 16%, transparent), transparent 62%); }
+#rpg-area h1, #rpg-area h2, #rpg-area h3 { color: var(--texto); }
+#rpg-area .card { background: var(--card); border-color: var(--linha); box-shadow: none; color: var(--texto); }
+#rpg-area .btn { background: var(--tinta); color: var(--sobre); border-color: var(--tinta); }
+#rpg-area .btn.sec { background: transparent; color: var(--tinta); }
+#rpg-area .btn.perigo { background: transparent; color: #ff6b78; border-color: #ff6b78; }
+#rpg-area .btn[disabled] { opacity: .45; cursor: not-allowed; }
+#rpg-area .in, #rpg-area textarea, #rpg-area select { background: color-mix(in srgb, var(--papel) 70%, #000); color: var(--texto); border: 1.5px solid var(--linha); border-radius: 10px; padding: 9px 12px; min-height: 44px; width: 100%; }
+#rpg-area .muted { color: var(--suave); }
+#rpg-area .chip { background: transparent; color: var(--suave); border: 1.5px solid var(--linha); }
+#rpg-area .chip[aria-pressed="true"] { background: var(--tinta); color: var(--sobre); border-color: var(--tinta); }
+
+.rpg-topo { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; justify-content: space-between; margin-bottom: 14px; }
+.rpg-topo h1 { font-size: clamp(24px, 4.5vw, 36px); }
+.rpg-grade { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.rpg-card { display: grid; gap: 8px; text-align: left; cursor: pointer; transition: border-color .15s; }
+.rpg-card:hover { border-color: var(--tinta); }
+.rpg-card .nome { font-family: var(--display); font-weight: 800; font-size: 20px; }
+.rpg-card .meta { font-size: 14px; color: var(--suave); }
+.rpg-card .linha { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tag-estado { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px; border: 1.5px solid var(--linha); }
+.tag-estado.andamento { border-color: #46d39a; color: #46d39a; }
+.tag-estado.aguardando { border-color: #f2c14e; color: #f2c14e; }
+.tag-estado.pausado { border-color: #ff6b78; color: #ff6b78; }
+.tag-convite { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: var(--tinta); color: var(--sobre); }
+
+.univ-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 6px; }
+.univ-op { border: 2px solid var(--linha); border-radius: 12px; padding: 10px; text-align: left; display: grid; gap: 2px; cursor: pointer; background: var(--papel); }
+.univ-op b { font-family: var(--display); font-size: 16px; }
+.univ-op small { opacity: .85; }
+.univ-op[aria-pressed="true"] { outline: 3px solid var(--tinta); outline-offset: 2px; }
+
+.attr-lista { display: grid; gap: 6px; margin-top: 6px; }
+.attr-item { display: flex; align-items: center; gap: 10px; justify-content: space-between; border: 1.5px solid var(--linha); border-radius: 10px; padding: 8px 12px; background: var(--papel); }
+.attr-item b { font-size: 15px; }
+.attr-item small { display: block; color: var(--suave); }
+.attr-um { min-width: 110px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--tinta); background: var(--tinta); color: var(--sobre); font-weight: 800; }
+.attr-um.escolhido { background: #b9b9b9; border-color: #b9b9b9; color: #333; }
+
+.chat-rpg { display: flex; flex-direction: column; height: min(72vh, 720px); min-height: 420px; border: 1.5px solid var(--linha); border-radius: 16px; overflow: hidden; background: color-mix(in srgb, var(--papel) 82%, #000); }
+.feed-rpg { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.bolha { max-width: min(88%, 480px); padding: 8px 12px 6px; border-radius: 14px 14px 14px 4px; background: var(--card); border: 1.5px solid var(--linha); align-self: flex-start; display: grid; gap: 4px; overflow-wrap: anywhere; }
+.bolha.meu { align-self: flex-end; border-radius: 14px 14px 4px 14px; background: color-mix(in srgb, var(--tinta) 20%, var(--card)); border-color: var(--tinta); }
+.bolha.mestre { background: var(--tinta); color: var(--sobre); border-color: var(--tinta); }
+.bolha.mestre .quem, .bolha.mestre .hora { color: var(--sobre); opacity: .9; }
+.bolha .quem { font-weight: 700; font-size: 13px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.bolha .hora { font-size: 11px; color: var(--suave); justify-self: end; }
+.bolha audio { max-width: 100%; margin-top: 4px; }
+.b-sis { align-self: center; font-size: 13px; color: var(--suave); background: color-mix(in srgb, var(--card) 75%, transparent); border-radius: 999px; padding: 3px 12px; text-align: center; max-width: 92%; }
+.b-narra { align-self: center; max-width: 94%; border: 1.5px dashed var(--tinta); border-radius: 14px; padding: 10px 14px; text-align: center; background: color-mix(in srgb, var(--tinta) 9%, transparent); display: grid; gap: 4px; overflow-wrap: anywhere; }
+.b-narra .t { font-style: italic; }
+.b-pedido { border-color: var(--tinta); background: color-mix(in srgb, var(--tinta) 12%, var(--card)); }
+.b-pedido .f { font-family: var(--display); font-weight: 800; font-size: 22px; color: var(--tinta); }
+.b-rola { align-self: center; text-align: center; border: 1.5px solid var(--tinta); background: var(--card); border-radius: 16px; padding: 8px 22px 10px; min-width: 200px; max-width: 92%; display: grid; gap: 2px; }
+.b-rola .n { font-family: var(--display); font-weight: 800; font-size: 44px; line-height: 1; color: var(--tinta); }
+.chat-barra { display: flex; gap: 8px; padding: 10px; border-top: 1.5px solid var(--linha); background: var(--card); align-items: center; flex-wrap: wrap; }
+.chat-barra .in { flex: 1; min-width: 140px; min-height: 48px; }
+.btn-eu { min-height: 52px; border-radius: 999px; border: 0; background: var(--tinta); color: var(--sobre); font-family: var(--display); font-weight: 800; font-size: 22px; padding: 0 24px; flex: 1; }
+.btn-eu[disabled] { opacity: .4; cursor: not-allowed; }
+.btn-grav { min-height: 48px; border-radius: 999px; border: 2px solid var(--tinta); background: transparent; color: var(--tinta); font-weight: 800; padding: 0 16px; }
+.btn-grav.gravando { background: #d62839; border-color: #d62839; color: #fff; }
+.painel-rpg { display: grid; gap: 10px; }
+.ficha-mini { display: grid; gap: 6px; }
+.ficha-mini header { display: flex; gap: 8px; justify-content: space-between; align-items: start; }
+.ficha-mini h3 { font-size: 18px; }
+.attrs-mini { display: flex; gap: 4px; flex-wrap: wrap; font-size: 13px; }
+.attrs-mini span { border: 1.5px solid var(--linha); border-radius: 8px; padding: 1px 8px; }
+.pts-barra { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pts-barra .val { font-family: var(--display); font-size: 22px; min-width: 32px; text-align: center; }
+.aviso-inline { border-left: 4px solid var(--tinta); padding: 6px 10px; background: color-mix(in srgb, var(--tinta) 10%, transparent); border-radius: 0 8px 8px 0; overflow-wrap: anywhere; }
+.rolagem-item { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.rolagem-item select { width: auto; min-width: 90px; }
+.rolagem-item input[type=number] { width: 70px; }
+
+@media (max-width: 760px) {
+  #rpg-area { padding: 12px; border-radius: 16px; }
+  .chat-rpg { height: calc(100vh - 210px); min-height: 340px; }
+}
+</style>
+</head>
+<body>
+<div id="raiz"></div>
+<div id="toast" hidden></div>
+
+<script>
+/* ============ utilidades ============ */
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = (s) => String(s == null ? '' : s).split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;').split('"').join('&quot;').split("'").join('&#39;');
+const expirou = (m) => String(m).indexOf('Sessão expirada') >= 0;
+const ehHttp = (u) => { u = String(u).toLowerCase(); return u.indexOf('http:' + '//') === 0 || u.indexOf('https:' + '//') === 0; };
+const semProtocolo = (u) => String(u).split('https:' + '//').join('').split('http:' + '//').join('');
+const pad = (n) => String(n).padStart(2, '0');
+const iso = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const hoje = () => iso(new Date());
+const dt = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const fmtData = (s) => s ? dt(s).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '') : '';
+const guardar = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} } };
+const dBR = (s) => (s ? s.slice(8, 10) + '/' + s.slice(5, 7) + '/' + s.slice(0, 4) : '');
+
+const S = {
+  token: guardar.get('qt_token'), eu: null, pessoas: [], dados: {}, rpgNivel: 0,
+  aba: 'inicio', filtroT: 'todas', mes: { y: new Date().getFullYear(), m: new Date().getMonth() }, dia: null,
+  usuariosAdmin: [],
+  rpgSala: null, rpgUniversos: [], rpgAtributos: [], rpgDados: null,
+  novoRpg: null, criar: null, montar: null, euAudio: null,
+  feedSig: '', feedVisto: false, barraSig: ''
+};
+
+const SEM_SALA = ['rpgListar', 'rpgCriar'];
+function chamar(acao, p) {
+  p = p || {};
+  if (S.rpgSala && acao.indexOf('rpg') === 0 && p.sala_id === undefined && SEM_SALA.indexOf(acao) < 0) p = Object.assign({}, p, { sala_id: S.rpgSala });
+  return new Promise((ok, falha) => {
+    google.script.run
+      .withSuccessHandler((r) => (r && r.ok ? ok(r.d) : falha(new Error(r ? r.erro : 'Resposta vazia'))))
+      .withFailureHandler((e) => falha(new Error((e && e.message) || 'Sem conexão. Tente de novo.')))
+      .api(S.token, acao, p);
+  });
+}
+
+let toastT;
+function aviso(msg, erro) {
+  const t = $('#toast'); t.textContent = msg; t.className = erro ? 'erro-t' : ''; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), erro ? 4500 : 2200);
+}
+async function tentar(fn) { try { return await fn(); } catch (e) { if (expirou(e.message)) return sair(true); aviso(e.message, true); } }
+
+const pessoa = (id) => S.pessoas.find((p) => p.id === id);
+const cor = (id) => (pessoa(id) || {}).cor || '#7a80a8';
+const av = (nome, c, sm) => `<span class="av${sm ? ' sm' : ''}" style="background:${esc(c || '#7a80a8')}" title="${esc(nome)}">${esc((nome || '?').trim()[0] || '?').toUpperCase()}</span>`;
+const avP = (id, sm) => { const p = pessoa(id); return p ? av(p.nome, p.cor, sm) : ''; };
+const nivel = (m) => S.eu.papel === 'admin' ? 2 : ({ editar: 2, ver: 1 }[S.eu.permissoes[m]] || 0);
+const admin = () => S.eu && S.eu.papel === 'admin';
+/* ============ módulos ============ */
+const OPC_CAT = [['escola', 'Escola'], ['fora', 'Fora da escola']];
+const MODS = {
+  tarefas: { nome: 'Tarefas', ic: '✅', novo: 'Nova tarefa', form: [
+    { k: 'titulo', l: 'O que precisa ser feito', t: 'text', req: 1, ph: 'Ex.: slides de Geografia' },
+    { k: 'descricao', l: 'Detalhes', t: 'area' },
+    { k: 'responsavel_id', l: 'Quem faz', t: 'pessoa' },
+    { k: 'prazo', l: 'Prazo', t: 'date' },
+    { k: 'status', l: 'Andamento', t: 'sel', o: [['a_fazer', 'A fazer'], ['fazendo', 'Fazendo'], ['feito', 'Feito']] },
+    { k: 'categoria', l: 'Tipo', t: 'sel', o: OPC_CAT }] },
+  eventos: { nome: 'Agenda', ic: '📅', novo: 'Novo evento', form: [
+    { k: 'titulo', l: 'Nome do evento', t: 'text', req: 1, ph: 'Ex.: apresentação do trabalho' },
+    { k: 'data', l: 'Data', t: 'date', req: 1 }, { k: 'hora', l: 'Hora', t: 'time' },
+    { k: 'local', l: 'Onde', t: 'text' }, { k: 'descricao', l: 'Detalhes', t: 'area' },
+    { k: 'categoria', l: 'Tipo', t: 'sel', o: OPC_CAT }] },
+  avisos: { nome: 'Mural', ic: '📌', novo: 'Novo aviso', form: [
+    { k: 'titulo', l: 'Título', t: 'text', req: 1 }, { k: 'texto', l: 'Mensagem', t: 'area' },
+    { k: 'fixado', l: 'Fixar no topo do mural', t: 'check' }] },
+  links: { nome: 'Links', ic: '🔗', novo: 'Novo link', form: [
+    { k: 'titulo', l: 'Nome', t: 'text', req: 1, ph: 'Ex.: pasta do Drive' },
+    { k: 'url', l: 'Endereço (URL)', t: 'text', req: 1, ph: 'https://' }, { k: 'descricao', l: 'Para que serve', t: 'area' }] }
+};
+
+/* ============ modal ============ */
+function abrirModal(titulo, corpo, opc) {
+  opc = opc || {};
+  fecharModal();
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  ov.innerHTML = `<div class="modal${opc.larga ? ' larga' : ''}" role="dialog" aria-modal="true" aria-label="${esc(titulo)}"><h2>${esc(titulo)}</h2><form id="mf" novalidate>${corpo}<p class="erro" id="mf-erro" role="alert"></p><div class="rodape">${opc.extra || ''}<button type="button" class="btn sec" data-act="fechar">${opc.somenteLer ? 'Fechar' : 'Cancelar'}</button>${opc.somenteLer ? '' : `<button class="btn" type="submit">${esc(opc.salvar || 'Salvar')}</button>`}</div></form></div>`;
+  ov.addEventListener('mousedown', (e) => { if (e.target === ov) fecharModal(); });
+  document.body.appendChild(ov);
+  const f = $('#mf', ov);
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!opc.onSubmit) return fecharModal();
+    const b = $('button[type=submit]', f); b.disabled = true;
+    try { await opc.onSubmit(f); } catch (er) {
+      if (expirou(er.message)) return sair(true);
+      $('#mf-erro').textContent = er.message; b.disabled = false;
+    }
+  });
+  const primeiro = $('input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea, select', f);
+  if (primeiro && !opc.semFoco) primeiro.focus();
+  return f;
+}
+function fecharModal() { document.querySelectorAll('.overlay').forEach((o) => o.remove()); if (typeof limparGravacao === 'function') limparGravacao(); }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharModal(); });
+
+function campoHTML(f, v) {
+  v = v == null ? '' : v;
+  const id = 'f_' + f.k;
+  if (f.t === 'check') return `<div class="campo"><label class="check"><input type="checkbox" name="${f.k}" ${v === 'true' || v === true ? 'checked' : ''}> ${esc(f.l)}</label></div>`;
+  let ctl;
+  if (f.t === 'area') ctl = `<textarea id="${id}" name="${f.k}">${esc(v)}</textarea>`;
+  else if (f.t === 'sel') ctl = `<select id="${id}" name="${f.k}">${f.o.map((o) => `<option value="${o[0]}" ${o[0] === v ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>`;
+  else if (f.t === 'pessoa') ctl = `<select id="${id}" name="${f.k}"><option value="">Ninguém ainda</option>${S.pessoas.map((p) => `<option value="${p.id}" ${p.id === v ? 'selected' : ''}>${esc(p.nome)}</option>`).join('')}</select>`;
+  else ctl = `<input id="${id}" type="${f.t === 'date' ? 'date' : f.t === 'time' ? 'time' : 'text'}" name="${f.k}" value="${esc(v)}" ${f.ph ? `placeholder="${esc(f.ph)}"` : ''} ${f.t === 'text' ? 'maxlength="500"' : ''}>`;
+  return `<div class="campo"><label for="${id}">${esc(f.l)}</label>${ctl}</div>`;
+}
+
+function visHTML(v) {
+  const todos = !v || v === '*';
+  const ids = todos || v === '-' ? [] : v.split(',');
+  return `<fieldset class="vis"><legend>Quem pode ver</legend>
+    <label class="check"><input type="radio" name="vismodo" value="todos" ${todos ? 'checked' : ''}> Todo mundo que tem acesso a esta área</label>
+    <label class="check"><input type="radio" name="vismodo" value="alguns" ${todos ? '' : 'checked'}> Só estas pessoas</label>
+    <div class="vis-lista">${S.pessoas.map((p) => `<label class="check"><input type="checkbox" name="vis" value="${p.id}" ${ids.includes(p.id) ? 'checked' : ''}> ${esc(p.nome)}</label>`).join('')}</div>
+    <p class="dica muted" style="margin:8px 0 0">Você (admin), quem criou e o responsável sempre veem.</p></fieldset>`;
+}
+function lerVis(f) {
+  if ((f.elements.vismodo || {}).value !== 'alguns') return '*';
+  return [...f.querySelectorAll('input[name=vis]:checked')].map((i) => i.value);
+}
+
+function formItem(mod, it) {
+  const def = MODS[mod]; const novo = !it;
+  it = it || { status: 'a_fazer', categoria: 'escola', data: S.dia || '' };
+  const corpo = def.form.map((f) => campoHTML(f, it[f.k])).join('') + (admin() ? visHTML(novo ? '*' : it.visivel_para) : '');
+  const podeExcluir = !novo && (admin() || it.criado_por === S.eu.id);
+  const extra = podeExcluir ? `<button type="button" class="btn perigo esq" data-act="excluir" data-mod="${mod}" data-id="${it.id}">Excluir</button>` : '';
+  abrirModal(novo ? def.novo : 'Editar', corpo, { extra, onSubmit: async (f) => {
+    const item = novo ? {} : { id: it.id };
+    def.form.forEach((fl) => { const el = f.elements[fl.k]; item[fl.k] = fl.t === 'check' ? el.checked : el.value; });
+    if (admin()) item.visivel_para = lerVis(f);
+    await chamar('salvar', { mod, item });
+    fecharModal(); await recarregar(); aviso('Salvo');
+  } });
+}
+
+function detalhe(mod, it) {
+  const def = MODS[mod];
+  const corpo = def.form.map((f) => {
+    let v = it[f.k]; if (!v || v === 'false') return '';
+    if (f.t === 'pessoa') v = (pessoa(v) || {}).nome || '';
+    if (f.t === 'sel') v = (f.o.find((o) => o[0] === v) || [])[1];
+    if (f.t === 'date') v = fmtData(v);
+    if (f.t === 'check') v = 'Sim';
+    return `<div class="campo"><span class="rot">${esc(f.l)}</span><div style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(v)}</div></div>`;
+  }).join('');
+  abrirModal(it.titulo, corpo, { somenteLer: true });
+}
+function abrirItem(mod, id) {
+  const it = (S.dados[mod] || []).find((x) => x.id === id); if (!it) return;
+  nivel(mod) >= 2 ? formItem(mod, it) : detalhe(mod, it);
+}
+
+/* ============ dados ============ */
+async function recarregar(silencioso) {
+  try {
+    const r = await chamar('carregar');
+    S.eu = r.eu; S.pessoas = r.pessoas; S.dados = r.dados; S.rpgNivel = r.rpg;
+    if (!silencioso || !document.querySelector('.overlay')) render(true);
+  } catch (e) { if (!silencioso) throw e; if (expirou(e.message)) sair(true); }
+}
+
+/* ============ login ============ */
+function telaLogin() {
+  $('#raiz').innerHTML = `<div class="login"><form class="card" id="lf" novalidate>
+    <span class="logo">Quadro da Turma</span>
+    <h1>Entrar</h1>
+    <p class="muted" style="margin:0 0 16px">Use o usuário e a senha que o administrador te deu.</p>
+    <div class="campo"><label for="l_u">Usuário</label><input id="l_u" type="text" name="usuario" autocomplete="username" autocapitalize="none" autocorrect="off"></div>
+    <div class="campo"><label for="l_s">Senha</label><input id="l_s" type="password" name="senha" autocomplete="current-password"></div>
+    <p class="erro" id="l_erro" role="alert"></p>
+    <button class="btn" style="width:100%;justify-content:center" type="submit">Entrar</button>
+    <p class="muted" style="margin:14px 0 0">O administrador pode ver as senhas deste site. Não use aqui uma senha que você usa em outros lugares.</p>
+  </form></div>`;
+  $('#l_u').focus();
+  $('#lf').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const b = $('button', f); b.disabled = true;
+    try {
+      const r = await chamar('login', { usuario: f.usuario.value, senha: f.senha.value });
+      S.token = r.token; guardar.set('qt_token', r.token); await iniciar();
+    } catch (er) { $('#l_erro').textContent = er.message; b.disabled = false; }
+  });
+}
+
+async function sair(expirou) {
+  if (!expirou && S.token) { try { await chamar('sair'); } catch (e) {} }
+  S.token = null; S.eu = null; S.rpgSala = null; S.rpgDados = null; guardar.set('qt_token', null); clearInterval(S.poll); fecharModal();
+  telaLogin();
+  if (expirou) setTimeout(() => { const e = $('#l_erro'); if (e) e.textContent = 'Sua sessão expirou. Entre de novo.'; }, 0);
+}
+
+async function iniciar() {
+  try {
+    if (S.token) { await recarregar(); }
+    else { const e = await chamar('estado'); return telaLogin(); }
+  } catch (e) {
+    S.token = null; guardar.set('qt_token', null);
+    try { const est = await chamar('estado'); return telaLogin(); } catch (e2) { $('#raiz').innerHTML = `<div class="login"><div class="card"><h1>Sem conexão</h1><p>${esc(e2.message)}</p><button class="btn" onclick="location.reload()">Tentar de novo</button></div></div>`; return; }
+  }
+  clearInterval(S.poll);
+  S.pollN = 0;
+  S.poll = setInterval(() => {
+    if (document.hidden || document.querySelector('.overlay') || !S.eu) return;
+    S.pollN++;
+    if (S.aba === 'rpg') { if (S.rpgSala) recarregarSala(true); else if (S.pollN % 3 === 0) abrirRpg(true); }
+    else if (S.pollN % 3 === 0) recarregar(true);
+  }, 6000);
+}
+
+/* ============ estrutura ============ */
+function abasDisponiveis() {
+  const a = [['inicio', '🏠', 'Início']];
+  [['tarefas', 'Tarefas', '✅'], ['eventos', 'Agenda', '📅'], ['avisos', 'Mural', '📌'], ['links', 'Links', '🔗']].forEach(([m, n, i]) => { if (nivel(m) >= 1) a.push([m, i, n]); });
+  if (nivel('rpg') >= 1) a.push(['rpg', '🎲', 'RPG']);
+  if (admin()) a.push(['admin', '⚙️', 'Pessoas']);
+  return a;
+}
+
+function render(manterRpg) {
+  if (!S.eu) return;
+  const abas = abasDisponiveis();
+  if (!abas.some((a) => a[0] === S.aba)) S.aba = 'inicio';
+  if (!$('#view')) {
+    $('#raiz').innerHTML = `<header class="topo"><div class="topo-in"><span class="logo">Quadro da Turma</span><nav class="nav" id="nav" aria-label="Seções"></nav>
+      <button class="eu" data-act="conta" aria-label="Minha conta">${av(S.eu.nome, S.eu.cor)}<span class="nm">${esc(S.eu.nome)}</span></button></div></header><main class="app" id="view"></main>`;
+  }
+  $('#nav').innerHTML = abas.map((a) => `<button data-act="aba" data-aba="${a[0]}" ${S.aba === a[0] ? 'aria-current="page"' : ''}><span class="ic" aria-hidden="true">${a[1]}</span>${a[2]}</button>`).join('');
+  if (S.aba === 'rpg') { if (!manterRpg || (!$('#rpg-area') && !$('#rpg-lista'))) renderRpg(); return; }
+  const v = { inicio: viewInicio, tarefas: viewTarefas, eventos: viewAgenda, avisos: viewMural, links: viewLinks, admin: viewAdmin }[S.aba];
+  $('#view').innerHTML = v();
+  if (S.aba === 'admin') carregarAdmin();
+}
+
+function topoPg(titulo, sub, acoes) {
+  return `<div class="titulo-pg"><div><h1>${esc(titulo)}</h1>${sub ? `<p class="sub">${esc(sub)}</p>` : ''}</div><div class="acoes">${acoes || ''}</div></div>`;
+}
+const btnNovo = (m) => nivel(m) >= 2 ? `<button class="btn" data-act="novo" data-mod="${m}">+ ${MODS[m].novo}</button>` : '';
+const visTag = (it) => {
+  if (!admin()) return '';
+  const v = it.visivel_para || '*'; if (v === '*') return '';
+  const nomes = v === '-' ? 'só admin' : 'só ' + v.split(',').map((id) => (pessoa(id) || { nome: '?' }).nome).join(', ');
+  return `<span class="tag vis" title="Quem vê">🔒 ${esc(nomes)}</span>`;
+};
+function pillPrazo(s, feito) {
+  if (!s) return '';
+  const h = hoje(); const cls = feito ? '' : s < h ? 'atraso' : s === h ? 'hoje' : '';
+  return `<span class="data-pill ${cls}">${s === h ? 'hoje' : fmtData(s)}</span>`;
+}
+
+/* ---- início ---- */
+function viewInicio() {
+  const h = hoje();
+  const minhas = (S.dados.tarefas || []).filter((t) => t.responsavel_id === S.eu.id && t.status !== 'feito').sort((a, b) => (a.prazo || '9') < (b.prazo || '9') ? -1 : 1);
+  const lim = iso(new Date(Date.now() + 14 * 864e5));
+  const prox = [
+    ...(S.dados.eventos || []).filter((e) => e.data >= h && e.data <= lim).map((e) => ({ t: e.titulo, d: e.data, h: e.hora, tipo: 'ev', id: e.id })),
+    ...(S.dados.tarefas || []).filter((e) => e.prazo >= h && e.prazo <= lim && e.status !== 'feito').map((e) => ({ t: 'Prazo: ' + e.titulo, d: e.prazo, tipo: 'tf', id: e.id }))
+  ].sort((a, b) => (a.d + (a.h || '')) < (b.d + (b.h || '')) ? -1 : 1);
+  const av3 = (S.dados.avisos || []).slice().sort((a, b) => (b.fixado === 'true') - (a.fixado === 'true') || (a.criado_em < b.criado_em ? 1 : -1)).slice(0, 3);
+  const bloco = (tit, corpo, vazio) => `<section class="card"><h2>${tit}</h2>${corpo || `<p class="muted" style="margin:0">${vazio}</p>`}</section>`;
+  const data = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const blocos = [];
+  if (S.dados.tarefas) blocos.push(bloco('Minhas tarefas', minhas.length ? `<ul class="lista">${minhas.slice(0, 6).map((t) => `<li><button class="link" data-act="abrir" data-mod="tarefas" data-id="${t.id}">${esc(t.titulo)}</button>${pillPrazo(t.prazo)}</li>`).join('')}</ul>` : '', 'Nada pendente com você. Bom trabalho!'));
+  if (S.dados.eventos || S.dados.tarefas) blocos.push(bloco('Próximos 14 dias', prox.length ? `<ul class="lista">${prox.slice(0, 7).map((e) => `<li><button class="link" data-act="abrir" data-mod="${e.tipo === 'ev' ? 'eventos' : 'tarefas'}" data-id="${e.id}">${esc(e.t)}</button><span class="data-pill">${e.d === h ? 'hoje' : fmtData(e.d)}${e.h ? ' · ' + esc(e.h) : ''}</span></li>`).join('')}</ul>` : '', 'Nenhum evento ou prazo nas próximas duas semanas.'));
+  if (S.dados.avisos) blocos.push(bloco('Mural', av3.length ? `<ul class="lista">${av3.map((a) => `<li><button class="link" data-act="abrir" data-mod="avisos" data-id="${a.id}">${a.fixado === 'true' ? '📌 ' : ''}${esc(a.titulo)}</button></li>`).join('')}</ul>` : '', 'Sem avisos por enquanto.'));
+  return topoPg('Oi, ' + S.eu.nome.split(' ')[0] + '.', data) + (blocos.length ? `<div class="inicio-grid">${blocos.join('')}</div>` : '<div class="vazio">O administrador ainda não liberou nenhuma área para você.</div>');
+}
+
+/* ---- tarefas ---- */
+function viewTarefas() {
+  const f = S.filtroT; const L = S.dados.tarefas || [];
+  const lista = L.filter((t) => f === 'todas' || (f === 'minhas' ? t.responsavel_id === S.eu.id : t.categoria === f));
+  const col = (st, nome) => {
+    const its = lista.filter((t) => t.status === st).sort((a, b) => (a.prazo || '9') < (b.prazo || '9') ? -1 : 1);
+    return `<section class="coluna" aria-label="${nome}"><h2>${nome} <span class="n">${its.length}</span></h2>${its.map((t) => {
+      const ord = ['a_fazer', 'fazendo', 'feito']; const i = ord.indexOf(t.status);
+      const mv = nivel('tarefas') >= 2 ? `<div class="mv">${i > 0 ? `<button class="btn sec mini" data-act="mover" data-id="${t.id}" data-d="-1" aria-label="Voltar para ${ord[i - 1].replace('_', ' ')}">← Voltar</button>` : ''}${i < 2 ? `<button class="btn sec mini" data-act="mover" data-id="${t.id}" data-d="1">${i === 1 ? 'Feito ✓' : 'Começar →'}</button>` : ''}</div>` : '';
+      return `<div class="card tarefa ${t.categoria === 'fora' ? 'fora' : ''} ${t.status === 'feito' ? 'feito' : ''}"><span class="t clicavel" role="button" tabindex="0" data-act="abrir" data-mod="tarefas" data-id="${t.id}" style="cursor:pointer">${esc(t.titulo)}</span>
+        <div class="row"><span class="tag ${t.categoria === 'fora' ? 'fora' : ''}">${t.categoria === 'fora' ? 'Fora da escola' : 'Escola'}</span>${pillPrazo(t.prazo, t.status === 'feito')}${t.responsavel_id ? `<span class="row" style="gap:4px">${avP(t.responsavel_id, true)}<span class="muted">${esc((pessoa(t.responsavel_id) || {}).nome || '')}</span></span>` : ''}${visTag(t)}</div>${mv}</div>`;
+    }).join('') || '<p class="muted" style="margin:4px">Nada aqui.</p>'}</section>`;
+  };
+  const chips = [['todas', 'Todas'], ['escola', 'Escola'], ['fora', 'Fora da escola'], ['minhas', 'Minhas']].map((c) => `<button class="chip" data-act="filtro" data-f="${c[0]}" aria-pressed="${f === c[0]}">${c[1]}</button>`).join('');
+  return topoPg('Tarefas', 'Trabalhos da escola e planos fora dela', btnNovo('tarefas')) + `<div class="chips" style="margin-bottom:14px">${chips}</div>` + (L.length ? `<div class="quadro">${col('a_fazer', 'A fazer')}${col('fazendo', 'Fazendo')}${col('feito', 'Feito')}</div>` : `<div class="vazio">Nenhuma tarefa ainda.${nivel('tarefas') >= 2 ? ' Crie a primeira no botão acima.' : ''}</div>`);
+}
+
+/* ---- agenda ---- */
+function itensDia(ds) {
+  return {
+    ev: (S.dados.eventos || []).filter((e) => e.data === ds).sort((a, b) => (a.hora || '') < (b.hora || '') ? -1 : 1),
+    tf: (S.dados.tarefas || []).filter((t) => t.prazo === ds && t.status !== 'feito')
+  };
+}
+function viewAgenda() {
+  const { y, m } = S.mes; const prim = new Date(y, m, 1); const n = new Date(y, m + 1, 0).getDate(); const off = prim.getDay(); const h = hoje();
+  let cel = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d) => `<div class="sem" aria-hidden="true">${d}</div>`).join('');
+  for (let i = 0; i < off; i++) cel += '<div></div>';
+  for (let d = 1; d <= n; d++) {
+    const ds = y + '-' + pad(m + 1) + '-' + pad(d); const it = itensDia(ds);
+    const pts = it.ev.slice(0, 3).map(() => '<i class="pt"></i>').join('') + it.tf.slice(0, 3).map(() => '<i class="pt tf"></i>').join('');
+    cel += `<button class="dia ${ds === h ? 'hoje' : ''}" data-act="dia" data-d="${ds}" aria-pressed="${S.dia === ds}" aria-label="${d} de ${prim.toLocaleDateString('pt-BR', { month: 'long' })}${it.ev.length + it.tf.length ? ', ' + (it.ev.length + it.tf.length) + ' item(ns)' : ''}"><span>${d}</span><span class="pts">${pts}</span></button>`;
+  }
+  const sel = S.dia || h; const it = itensDia(sel);
+  const linhas = it.ev.map((e) => `<div class="ev-item"><button class="link" data-act="abrir" data-mod="eventos" data-id="${e.id}">${esc(e.titulo)}</button><span class="muted">${e.hora ? esc(e.hora) : 'O dia todo'}${e.local ? ' · ' + esc(e.local) : ''}</span><span class="row"><span class="tag ${e.categoria === 'fora' ? 'fora' : ''}">${e.categoria === 'fora' ? 'Fora da escola' : 'Escola'}</span>${visTag(e)}</span></div>`).join('')
+    + it.tf.map((t) => `<div class="ev-item"><button class="link" data-act="abrir" data-mod="tarefas" data-id="${t.id}">Prazo: ${esc(t.titulo)}</button><span class="muted">${t.responsavel_id ? esc((pessoa(t.responsavel_id) || {}).nome || '') : 'Sem responsável'}</span></div>`).join('');
+  const mesNome = prim.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  return topoPg('Agenda', 'Provas, entregas e rolês', btnNovo('eventos'))
+    + `<div class="agenda"><div class="card"><div class="mes-cab"><button class="btn sec mini" data-act="mes" data-d="-1" aria-label="Mês anterior">←</button><h2>${mesNome}</h2><button class="btn sec mini" data-act="mes" data-d="1" aria-label="Próximo mês">→</button></div><div class="cal">${cel}</div>
+      <p class="muted" style="margin:10px 0 0"><i class="pt" style="display:inline-block"></i> evento &nbsp; <i class="pt tf" style="display:inline-block"></i> prazo de tarefa</p></div>
+      <div class="card"><h2 style="font-size:20px;margin-bottom:6px">${sel === h ? 'Hoje' : esc(fmtData(sel))}</h2>${linhas || '<p class="muted" style="margin:0">Nada marcado neste dia.</p>'}</div></div>`;
+}
+
+/* ---- mural ---- */
+function viewMural() {
+  const L = (S.dados.avisos || []).slice().sort((a, b) => (b.fixado === 'true') - (a.fixado === 'true') || (a.criado_em < b.criado_em ? 1 : -1));
+  return topoPg('Mural', 'Recados da turma', btnNovo('avisos')) + (L.length ? `<div class="mural">${L.map((a) => `<article class="card aviso ${a.fixado === 'true' ? 'fixado' : ''}"><h3>${a.fixado === 'true' ? '📌 ' : ''}${esc(a.titulo)}</h3>${a.texto ? `<p>${esc(a.texto)}</p>` : ''}<div class="row"><span class="muted">${avP(a.criado_por, true)} ${esc((pessoa(a.criado_por) || {}).nome || '')} · ${esc(fmtData((a.criado_em || '').slice(0, 10)))}</span>${visTag(a)}${nivel('avisos') >= 2 ? `<button class="btn sec mini" style="margin-left:auto" data-act="abrir" data-mod="avisos" data-id="${a.id}">Editar</button>` : ''}</div></article>`).join('')}</div>` : '<div class="vazio">Nenhum aviso ainda.</div>');
+}
+
+/* ---- links ---- */
+function viewLinks() {
+  const L = S.dados.links || [];
+  const seguro = (u) => ehHttp(u) ? u : '#';
+  return topoPg('Links', 'Pastas, sites e referências', btnNovo('links')) + (L.length ? `<div class="links">${L.map((l) => `<article class="card aviso"><a class="alvo" href="${esc(seguro(l.url))}" target="_blank" rel="noopener noreferrer">${esc(l.titulo)} ↗</a><span class="muted" style="overflow-wrap:anywhere">${esc(semProtocolo(l.url).slice(0, 60))}</span>${l.descricao ? `<p>${esc(l.descricao)}</p>` : ''}<div class="row">${visTag(l)}${nivel('links') >= 2 ? `<button class="btn sec mini" style="margin-left:auto" data-act="abrir" data-mod="links" data-id="${l.id}">Editar</button>` : ''}</div></article>`).join('')}</div>` : '<div class="vazio">Nenhum link ainda.</div>');
+}
+
+/* ============ admin: pessoas ============ */
+const NIVEIS = [['nenhum', 'Não vê'], ['ver', 'Só vê'], ['editar', 'Vê e altera']];
+const AREAS = [['tarefas', 'Tarefas'], ['eventos', 'Agenda'], ['avisos', 'Mural'], ['links', 'Links'], ['rpg', 'RPG']];
+function viewAdmin() {
+  return topoPg('Pessoas', 'Você decide quem entra, o que cada um vê e o que pode alterar', '<button class="btn" data-act="nova-pessoa">+ Cadastrar pessoa</button>') + '<div id="admin-lista" class="pessoas"><p class="muted">Carregando…</p></div>';
+}
+async function carregarAdmin() {
+  const r = await tentar(() => chamar('usuarios')); if (!r) return;
+  S.usuariosAdmin = r.usuarios;
+  const el = $('#admin-lista'); if (!el) return;
+  el.innerHTML = r.usuarios.map((u) => `<article class="card pessoa" style="${u.ativo ? '' : 'opacity:.6'}"><header>${av(u.nome, u.cor)}<div><div class="nm">${esc(u.nome)}</div><span class="muted">@${esc(u.usuario)} · ${u.papel === 'admin' ? 'administrador' : 'membro'}${u.ativo ? '' : ' · desativado'}</span></div></header>
+    <div class="chips">${u.papel === 'admin' ? '<span class="p-tag ed">vê e altera tudo</span>' : AREAS.map((a) => `<span class="p-tag ${u.permissoes[a[0]] === 'editar' ? 'ed' : u.permissoes[a[0]] === 'ver' ? 'on' : ''}">${a[1]}: ${u.permissoes[a[0]] === 'editar' ? 'altera' : u.permissoes[a[0]] === 'ver' ? 'vê' : '—'}</span>`).join('')}</div>
+    <div class="row"><span class="muted">Senha: <b data-senha="${esc(u.senha || '')}" data-oculta="1">${u.senha ? '••••••' : 'ainda não entrou'}</b></span>${u.senha ? `<button class="btn sec mini" data-act="ver-senha">Ver</button>` : ''}</div>
+    <div class="row"><button class="btn sec mini" data-act="editar-pessoa" data-id="${u.id}">Editar</button></div></article>`).join('');
+}
+function formPessoa(u) {
+  const novo = !u; u = u || { nome: '', usuario: '', papel: 'membro', cor: '#' + ['1b3bd1', 'e8590c', '168a5b', '8e44ad', 'd62839', '0b7285'][Math.floor(Math.random() * 6)], ativo: true, permissoes: { tarefas: 'ver', eventos: 'ver', avisos: 'ver', links: 'ver', rpg: 'nenhum' } };
+  const grade = AREAS.map((a) => `<label for="p_${a[0]}">${a[1]}</label><select id="p_${a[0]}" name="p_${a[0]}">${NIVEIS.map((n) => `<option value="${n[0]}" ${u.permissoes[a[0]] === n[0] ? 'selected' : ''}>${n[1]}</option>`).join('')}</select>`).join('');
+  const corpo = `<div class="duas"><div class="campo"><label for="u_nome">Nome</label><input id="u_nome" type="text" name="nome" value="${esc(u.nome)}" maxlength="40"></div>
+    <div class="campo"><label for="u_user">Usuário (para entrar)</label><input id="u_user" type="text" name="usuario" value="${esc(u.usuario)}" autocapitalize="none" maxlength="24"></div></div>
+    <div class="duas"><div class="campo"><label for="u_senha">${novo ? 'Senha' : 'Nova senha'}</label><input id="u_senha" type="text" name="senha" autocomplete="off" placeholder="${novo ? 'mínimo 4 caracteres' : 'deixe vazio para manter'}"><span class="dica">${novo ? 'Anote e passe para a pessoa.' : 'Trocar a senha desconecta a pessoa.'}</span></div>
+    <div class="campo"><label for="u_papel">Tipo</label><select id="u_papel" name="papel"><option value="membro" ${u.papel === 'membro' ? 'selected' : ''}>Membro</option><option value="admin" ${u.papel === 'admin' ? 'selected' : ''}>Administrador</option></select></div></div>
+    <div class="duas"><div class="campo"><label for="u_cor">Cor</label><input id="u_cor" type="color" name="cor" value="${esc(u.cor)}" style="width:100%;height:44px;border-radius:10px;border:1.5px solid var(--linha);background:var(--papel)"></div>
+    <div class="campo"><span class="rot">Conta</span><label class="check" style="min-height:44px"><input type="checkbox" name="ativo" ${u.ativo ? 'checked' : ''}> Ativa (pode entrar)</label></div></div>
+    <div class="campo"><span class="rot">O que essa pessoa pode fazer</span><div class="perm-grade">${grade}</div><span class="dica">Administradores sempre veem e alteram tudo. Dentro de cada área você ainda escolhe quem vê cada item.</span>
+    <div class="row" style="margin-top:6px"><button type="button" class="btn sec mini" data-act="preset" data-p="ver">Só ver tudo</button><button type="button" class="btn sec mini" data-act="preset" data-p="editar">Alterar tudo</button><button type="button" class="btn sec mini" data-act="preset" data-p="nenhum">Nada</button></div></div>`;
+  const extra = novo ? '' : `<button type="button" class="btn perigo esq" data-act="excluir-pessoa" data-id="${u.id}">Excluir</button>`;
+  abrirModal(novo ? 'Cadastrar pessoa' : 'Editar ' + u.nome, corpo, { larga: true, extra, onSubmit: async (f) => {
+    const permissoes = {}; AREAS.forEach((a) => (permissoes[a[0]] = f.elements['p_' + a[0]].value));
+    await chamar('salvarUsuario', { id: novo ? undefined : u.id, nome: f.nome.value, usuario: f.usuario.value, senha: f.senha.value, papel: f.papel.value, cor: f.cor.value, ativo: f.ativo.checked, permissoes });
+    fecharModal(); await recarregar(); aviso(novo ? 'Pessoa cadastrada' : 'Salvo');
+  } });
+}
+/* ============ RPG novo ============ */
+const RPG_DADOS = [4, 6, 8, 10, 12, 20, 100];
+
+function rpgMinhaPers() { return S.rpgDados ? S.rpgDados.meu_personagem : null; }
+
+async function renderRpg() {
+  S.rpgDados = null;
+  S.rpgSala = null;
+  $('#view').innerHTML = '<div id="rpg-lista"><p class="muted">Carregando…</p></div>';
+  await abrirRpg(false);
+}
+
+async function abrirRpg(silencioso) {
+  let r;
+  try { r = await chamar('rpgListar'); } catch (e) {
+    if (expirou(e.message)) return sair(true);
+    if (!silencioso) aviso(e.message, true);
+    return;
+  }
+  S.rpgUniversos = r.universos; S.rpgAtributos = r.atributos;
+  const el = $('#rpg-lista');
+  if (!el || S.aba !== 'rpg' || S.rpgSala || document.querySelector('.overlay')) return;
+  el.innerHTML = `<div id="rpg-area">
+    <div class="rpg-topo"><div><h1>🎲 Meus RPGs</h1><span class="muted">Crie uma aventura ou entre numa que te convidaram.</span></div>
+      <div class="row"><button class="btn sec" data-act="rpg-como">❓ Como jogar</button><button class="btn" data-act="rpg-novo">+ Novo RPG</button></div></div>
+    <div class="rpg-grade">${r.salas.length ? r.salas.map(cartaoSala).join('') : '<div class="vazio">Nenhum RPG ainda. Toque em "Novo RPG" para começar.</div>'}</div>
+  </div>`;
+}
+
+function cartaoSala(s) {
+  const U = (S.rpgUniversos.find((x) => x.id === s.universo) || {});
+  const status = s.status === 'andamento' ? 'Em andamento' : s.status === 'pausado' ? 'Pausado' : 'Aguardando jogadores';
+  const convite = s.meu_convite === 'pendente' ? '<span class="tag-convite">Convite pendente</span>' : '';
+  return `<article class="card rpg-card" data-act="rpg-abrir" data-id="${s.id}">
+    <div class="nome">${U.emoji || '🎲'} ${esc(s.nome)}</div>
+    <div class="meta">${esc(s.universo === 'livre' ? (s.universo_nome || 'Universo próprio') : (U.nome || s.universo))}</div>
+    <div class="meta">Mestre: ${esc(s.mestre_nome)} · ${s.jogadores} jogador${s.jogadores === 1 ? '' : 'es'}${s.pendentes ? ' · ' + s.pendentes + ' convite(s)' : ''}</div>
+    <div class="linha"><span class="tag-estado ${s.status}">${status}</span>${convite}</div>
+  </article>`;
+}
+
+function formNovoRpg() {
+  const pessoas = S.pessoas.filter((p) => p.id !== S.eu.id);
+  const listaP = pessoas.length
+    ? pessoas.map((p) => `<label class="check"><input type="checkbox" name="jg" value="${p.id}"> ${esc(p.nome)}</label>`).join('')
+    : '<p class="muted">Não há outras pessoas cadastradas.</p>';
+  const univ = S.rpgUniversos.map((u, i) => `<button type="button" class="univ-op" data-act="rpg-univ" data-id="${u.id}" aria-pressed="${i === 0}"><b>${u.emoji} ${esc(u.nome)}</b><small class="muted">${esc(u.desc)}</small></button>`).join('');
+  const atrs = S.rpgAtributos.map((a) => `<div class="attr-item" data-k="${a[0]}"><div><b>${esc(a[1])}</b><small>${esc(a[2])}</small></div><button type="button" class="attr-um" data-act="rpg-attr" data-id="${a[0]}" aria-pressed="false">Usar</button></div>`).join('');
+  S.novoRpg = { universo: S.rpgUniversos[0].id, atributos: [] };
+  const corpo = `<div class="campo"><label for="np_nome">Nome do RPG</label><input id="np_nome" type="text" name="nome" maxlength="60" placeholder="Ex.: A coroa partida"></div>
+    <div class="campo"><span class="rot">Quem vai jogar?</span><div class="vis-lista" style="margin:0">${listaP}</div><span class="dica">Só quem for marcado aqui recebe convite.</span></div>
+    <div class="campo"><span class="rot">Universo</span><div class="univ-grade" id="np_univ">${univ}</div></div>
+    <div class="campo" id="np_livre" style="display:none"><label for="np_univ_nome">Nome do seu universo</label><input id="np_univ_nome" type="text" name="universo_nome" maxlength="50"><label for="np_univ_desc" style="margin-top:6px">Uma frase descrevendo</label><input id="np_univ_desc" type="text" name="universo_desc" maxlength="160"></div>
+    <div class="campo"><span class="rot">Atributos que vão existir nesse RPG</span><div class="attr-lista" id="np_attrs">${atrs}</div><span class="dica">Toque em "Usar" para escolher os atributos. Mínimo 2.</span></div>`;
+  const extra = '<div class="row esq"><button type="button" class="btn" data-act="rpg-enviar">Enviar</button><button type="button" class="btn sec" data-act="rpg-criar-pers">Criar personagens</button></div>';
+  abrirModal('Novo RPG', corpo, { larga: true, extra, somenteLer: true });
+  atualizarNovoRpg();
+}
+
+function atualizarNovoRpg() {
+  if (!S.novoRpg || !$('#np_univ')) return;
+  document.querySelectorAll('#np_univ .univ-op').forEach((b) => b.setAttribute('aria-pressed', b.dataset.id === S.novoRpg.universo ? 'true' : 'false'));
+  const livre = S.novoRpg.universo === 'livre';
+  $('#np_livre').style.display = livre ? '' : 'none';
+  document.querySelectorAll('#np_attrs .attr-item').forEach((linha) => {
+    const k = linha.dataset.k; const on = S.novoRpg.atributos.indexOf(k) >= 0;
+    const b = linha.querySelector('.attr-um');
+    if (!b) return;
+    b.classList.toggle('escolhido', on);
+    b.textContent = on ? 'Escolhido' : 'Usar';
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
+function lerFormNovoRpg() {
+  const f = $('#mf'); if (!f) return null;
+  const jogadores = [...f.querySelectorAll('input[name=jg]:checked')].map((i) => i.value);
+  return {
+    nome: f.nome.value.trim(),
+    jogadores,
+    universo: S.novoRpg.universo,
+    universo_nome: f.universo_nome ? f.universo_nome.value : '',
+    universo_desc: f.universo_desc ? f.universo_desc.value : '',
+    atributos: S.novoRpg.atributos
+  };
+}
+
+async function enviarNovoRpg() {
+  const dados = lerFormNovoRpg(); if (!dados) return;
+  if (!dados.nome) return aviso('Dê um nome ao RPG.', true);
+  if (!dados.jogadores.length) return aviso('Escolha pelo menos uma pessoa para jogar.', true);
+  if (dados.atributos.length < 2) return aviso('Escolha pelo menos 2 atributos.', true);
+  const r = await chamar('rpgCriar', dados);
+  fecharModal(); aviso('RPG criado'); await abrirSala(r.id);
+}
+
+async function criarPersonagensNovoRpg() {
+  const dados = lerFormNovoRpg(); if (!dados) return;
+  if (!dados.nome) return aviso('Dê um nome ao RPG.', true);
+  if (!dados.atributos.length || dados.atributos.length < 2) return aviso('Escolha pelo menos 2 atributos.', true);
+  if (!dados.jogadores.length) return aviso('Escolha quem vai jogar.', true);
+  const r = await chamar('rpgCriar', dados);
+  fecharModal(); aviso('RPG criado');
+  await abrirSala(r.id);
+  formMontar(dados.jogadores[0], true);
+}
+
+async function abrirSala(id) { S.rpgSala = id; await recarregarSala(false); }
+
+async function recarregarSala(silencioso) {
+  if (!S.rpgSala) return;
+  let r;
+  try { r = await chamar('rpgEstadoSala'); } catch (e) {
+    if (expirou(e.message)) return sair(true);
+    if (e.message.indexOf('participa') >= 0 || e.message.indexOf('não encontrada') >= 0) { S.rpgSala = null; S.rpgDados = null; aviso(e.message, true); return renderRpg(); }
+    if (!silencioso) aviso(e.message, true);
+    return;
+  }
+  S.rpgDados = r;
+  if (S.aba !== 'rpg' || document.querySelector('.overlay')) return;
+  pintarSala();
+}
+
+function pintarSala() {
+  const D = S.rpgDados; const U = D.universo_dados; const c = U.cores;
+  let el = $('#rpg-sala');
+  if (!el) { $('#view').innerHTML = '<div id="rpg-sala"></div>'; el = $('#rpg-sala'); }
+  el.style.cssText = `--papel:${c.papel};--card:${c.card};--linha:${c.linha};--tinta:${c.tinta};--texto:${c.texto};--suave:${c.suave};--sobre:${c.sobre};`;
+  el.innerHTML = `<div id="rpg-area">${topoSala()}${corpoSala()}</div>`;
+  if ($('#chat-feed')) pintarFeedSala();
+}
+
+function topoSala() {
+  const D = S.rpgDados; const s = D.sala;
+  const pausado = s.status === 'pausado';
+  return `<div class="rpg-topo"><div><h1>${D.universo_dados.emoji} ${esc(s.nome)}</h1>
+    <span class="muted">${esc(s.universo === 'livre' ? (s.universo_nome || 'Universo próprio') : D.universo_dados.nome)} · ${esc(s.universo_desc || D.universo_dados.desc)}</span></div>
+    <div class="row"><button class="btn sec" data-act="rpg-voltar">← Meus RPGs</button>
+    <span class="tag-estado ${s.status}">${s.status === 'andamento' ? 'Em andamento' : pausado ? 'Pausado' : 'Aguardando jogadores'}</span>
+    <button class="btn sec" data-act="rpg-pausar">${pausado ? 'Retomar' : 'Sair'}</button>
+    ${D.mestre ? '<button class="btn" data-act="rpg-convidar">+ Convidar</button>' : ''}</div></div>`;
+}
+
+function corpoSala() {
+  const D = S.rpgDados; const s = D.sala;
+  if (D.eu.convite === 'pendente') return blocoConvite();
+  if (s.status === 'pausado') return `<div class="card"><h2>A aventura está pausada</h2><p class="muted">${D.mestre ? 'Toque em Retomar para continuar.' : 'O mestre saiu. Assim que ele voltar, a mesa reabre.'}</p>${D.mestre ? '<button class="btn" data-act="rpg-pausar" style="margin-top:10px">Retomar</button>' : ''}</div>`;
+  if (!D.mestre) {
+    const p = D.meu_personagem;
+    if (!p) return blocoCriarPers();
+    if (p.status === 'rejeitado') return blocoRejeitado(p);
+    if (p.status === 'enviado') return `<div class="card"><h2>Personagem enviado</h2><p class="muted">Aguardando o mestre aprovar ${esc(p.nome)}.</p>${mostrarPers(p)}</div>`;
+  }
+  const ehJogador = !D.mestre;
+  if (ehJogador && s.status !== 'andamento') return `<div class="card"><h2>Aguardando o início</h2><p class="muted">O mestre ainda está preparando a mesa.</p></div>`;
+  return layoutMesa();
+}
+
+function blocoConvite() {
+  const D = S.rpgDados;
+  const mestre = (D.membros.find((m) => m.id === D.sala.mestre_id) || {}).nome || 'o mestre';
+  return `<div class="card"><h2>Você foi convidado!</h2>
+    <p>Você foi convidado para participar do RPG de <b>${esc(mestre)}</b>.</p>
+    <p>O tema é: <b>${esc(D.universo_dados.nome)}</b> — ${esc(D.universo_dados.desc)}</p>
+    <div class="row"><button class="btn" data-act="rpg-aceitar">Aceitar</button><button class="btn sec" data-act="rpg-recusar">Recusar</button></div></div>`;
+}
+
+function blocoRejeitado(p) {
+  return `<div class="card"><h2>O mestre pediu alterações</h2>
+    <div class="aviso-inline">${esc(p.obs_mestre || 'Ajuste o personagem e envie de novo.')}</div>
+    ${mostrarPers(p)}
+    <div class="row" style="margin-top:10px"><button class="btn" data-act="rpg-editar-pers">Editar e reenviar</button></div></div>`;
+}
+
+function mostrarPers(p) {
+  const U = S.rpgDados.universo_dados;
+  const raca = (U.racas.find((r) => r[0] === p.raca) || [])[1] || p.raca;
+  const classe = (U.classes.find((k) => k[0] === p.classe) || [])[1] || p.classe;
+  const atrs = (p.atributos || []).map((a) => { const def = S.rpgAtributos.find((x) => x[0] === a.k); return `<span>${esc(def ? def[1] : a.k)} ${a.v}</span>`; }).join('');
+  return `<div class="ficha-mini"><h3>${esc(p.nome)}</h3><div class="meta muted">${esc(raca)} · ${esc(classe)}</div><div class="attrs-mini">${atrs}</div></div>`;
+}
+
+function blocoCriarPers() {
+  const D = S.rpgDados; const U = D.universo_dados; const atrs = D.sala.atributos;
+  const extra = atrs.length - 1;
+  S.criar = { nome: '', raca: U.racas[0][0], classe: U.classes[0][0], valores: atrs.map(() => 1) };
+  const racaOp = U.racas.map((r, i) => `<label class="univ-op" style="cursor:pointer"><input type="radio" name="raca" value="${r[0]}" ${i === 0 ? 'checked' : ''} style="display:none"><b>${esc(r[1])}</b><small class="muted">${esc(r[2])}</small></label>`).join('');
+  const classeOp = U.classes.map((k, i) => `<label class="univ-op" style="cursor:pointer"><input type="radio" name="classe" value="${k[0]}" ${i === 0 ? 'checked' : ''} style="display:none"><b>${esc(k[1])}</b><small class="muted">${esc(k[2])}</small></label>`).join('');
+  const linhas = atrs.map((a, i) => `<div class="attr-item"><div><b>${esc(a[1])}</b><small>${esc(a[2])}</small></div><div class="pts-barra"><button type="button" class="btn sec mini" data-act="rpg-pm" data-i="${i}">−</button><span class="val" id="cr_a${i}">1</span><button type="button" class="btn mini" data-act="rpg-pm" data-i="${i}" data-mais="1">+</button></div></div>`).join('');
+  setTimeout(atualizarCriarPers, 0);
+  return `<div class="card"><h2>Crie seu personagem</h2>
+    <p class="muted">Universo: ${esc(U.nome)}. Cada atributo começa com 1 e você distribui <b>${extra}</b> ponto${extra === 1 ? '' : 's'} extra${extra === 1 ? '' : 's'}.</p>
+    <div class="campo"><label for="cr_nome">Nome do personagem</label><input id="cr_nome" type="text" maxlength="40" autocomplete="off"></div>
+    <div class="campo"><span class="rot">Raça</span><div class="univ-grade" id="cr_raca">${racaOp}</div></div>
+    <div class="campo"><span class="rot">Classe</span><div class="univ-grade" id="cr_classe">${classeOp}</div></div>
+    <div class="campo"><span class="rot">Atributos</span><div class="attr-lista" id="cr_attrs">${linhas}</div><div class="aviso-inline" id="cr_pontos"></div></div>
+    <button class="btn" data-act="rpg-enviar-pers">Enviar para o mestre</button></div>`;
+}
+
+function atualizarCriarPers() {
+  if (!S.criar || !$('#cr_attrs')) return;
+  const atrs = S.rpgDados.sala.atributos; const extra = atrs.length - 1;
+  const usado = S.criar.valores.reduce((s, v) => s + v - 1, 0);
+  const sobra = extra - usado;
+  $('#cr_pontos').textContent = sobra > 0 ? 'Ainda sobram ' + sobra + ' ponto' + (sobra === 1 ? '' : 's') + '.' : sobra < 0 ? 'Você passou dos pontos!' : 'Tudo distribuído.';
+  S.criar.valores.forEach((v, i) => {
+    const el = $('#cr_a' + i); if (el) el.textContent = v;
+    const menos = document.querySelector('[data-act=rpg-pm][data-i="' + i + '"]:not([data-mais])');
+    const mais = document.querySelector('[data-act=rpg-pm][data-i="' + i + '"][data-mais]');
+    if (menos) menos.disabled = v <= 1; if (mais) mais.disabled = sobra <= 0;
+  });
+}
+
+function layoutMesa() {
+  const D = S.rpgDados;
+  const painel = D.mestre ? '<aside class="painel-rpg" id="rpg-painel"></aside>' : '';
+  const corpo = D.mestre
+    ? `<div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start"><section class="chat-rpg"><div class="feed-rpg" id="chat-feed"></div><div class="chat-barra" id="chat-barra"></div></section>${painel}</div>`
+    : `<div class="chat-rpg"><div class="feed-rpg" id="chat-feed"></div><div class="chat-barra" id="chat-barra"></div></div>`;
+  setTimeout(() => { pintarBarraSala(); if (D.mestre) pintarPainelSala(); }, 0);
+  return corpo;
+}
+
+function ehMeuPedidoSala(m) { return m.tipo === 'pedido' && m.estado === 'aberto' && m.para_user_id === S.eu.id; }
+function temPedidoAbertoParaMim() { return (S.rpgDados.msgs || []).some(ehMeuPedidoSala); }
+function temAcaoPendenteMinha() { return (S.rpgDados.msgs || []).some((m) => m.tipo === 'acao' && m.autor_id === S.eu.id && m.estado === 'pendente'); }
+function mestreFalouPorUltimo() {
+  const msgs = S.rpgDados.msgs || [];
+  for (let i = msgs.length - 1; i >= 0; i--) {
+    const m = msgs[i];
+    if (m.tipo === 'sistema' || m.tipo === 'rolagem') continue;
+    if (m.tipo === 'mestre' || m.tipo === 'narracao') return true;
+    if (m.tipo === 'jogador' || m.tipo === 'acao') return false;
+  }
+  return false;
+}
+
+function pintarFeedSala() {
+  const D = S.rpgDados; const feed = $('#chat-feed'); if (!feed) return;
+  const sig = D.msgs.map((m) => m.id + m.estado).join(',');
+  if (S.feedSig === sig) return;
+  S.feedSig = sig;
+  const perto = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 90 || !S.feedVisto;
+  feed.innerHTML = D.msgs.length ? D.msgs.map(bolhaSala).join('') : '<p class="vazio-chat muted">Nada por aqui ainda.</p>';
+  S.feedVisto = true;
+  if (perto) feed.scrollTop = feed.scrollHeight;
+}
+
+function bolhaSala(m) {
+  const h = esc((m.quando || '').slice(11, 16));
+  if (m.tipo === 'sistema') return `<div class="b-sis">${esc(m.texto)}</div>`;
+  if (m.tipo === 'narracao') return `<div class="b-narra"><small class="muted">📖 Narração</small><span class="t">${esc(m.texto)}</span></div>`;
+  if (m.tipo === 'pedido') return pedidoSalaHTML(m, h);
+  if (m.tipo === 'rolagem') return rolagemSalaHTML(m);
+  if (m.tipo === 'mestre') return `<div class="bolha mestre"><span class="quem">👑 ${esc(m.autor)}</span><span>${m.texto ? esc(m.texto) : ''}</span>${m.audio_id ? `<audio controls data-audio="${esc(m.audio_id)}"></audio>` : ''}<span class="hora">${h}</span></div>`;
+  const meu = m.autor_id === S.eu.id;
+  const audio = m.audio_id ? `<audio controls data-audio="${esc(m.audio_id)}"></audio>` : '';
+  const chips = m.estado ? `<span class="chip-estado">${m.estado === 'pendente' ? 'Aguardando o mestre' : m.estado === 'resolvido' ? 'Resolvido' : esc(m.estado)}</span>` : '';
+  const botoes = S.rpgDados.mestre && m.estado !== 'resolvido' && m.tipo === 'acao'
+    ? `<div class="row"><button class="btn mini" data-act="rpg-pedir-dado" data-id="${m.id}">🎲 Pedir dado</button><button class="btn sec mini" data-act="rpg-narrar" data-id="${m.id}">📖 Narrar</button></div>` : '';
+  return `<div class="bolha ${meu ? 'meu' : ''}"><span class="quem">${esc(m.autor)}</span>${m.texto ? `<span>${esc(m.texto)}</span>` : ''}${audio}
+    <span class="row" style="justify-content:space-between">${chips}<span class="hora">${h}</span></span>${botoes}</div>`;
+}
+
+function pedidoSalaHTML(m, h) {
+  const podeRolar = ehMeuPedidoSala(m) || S.rpgDados.mestre;
+  const dados = (m.dados || []).map((d) => d.qtd + 'd' + d.lados).join(' + ');
+  const acao = m.estado === 'aberto'
+    ? (podeRolar ? `<button class="btn mini" data-act="rpg-rolar" data-id="${m.id}">🎲 Jogar dados (${esc(dados)})</button>` : '<small class="muted">Aguardando o jogador rolar…</small>')
+    : `<small class="muted">${m.estado === 'usado' ? 'Já rolado' : esc(m.estado)}</small>`;
+  const alvo = (S.rpgDados.membros.find((x) => x.id === m.para_user_id) || {}).nome || '?';
+  return `<div class="bolha b-pedido"><span class="quem">👑 ${esc(m.autor)} pediu um dado para ${esc(alvo)}</span>
+    <span class="f">🎲 ${esc(dados)}</span>${m.texto ? `<small class="muted">${esc(m.texto)}</small>` : ''}${acao}<span class="hora">${h}</span></div>`;
+}
+
+function rolagemSalaHTML(m) {
+  const x = m.dados || {}; const res = x.resultados || [];
+  const linhas = res.map((r) => `<div class="muted">${r.qtd}d${r.lados}: [${r.valores.join(', ')}] = <b>${r.total}</b></div>`).join('');
+  return `<div class="b-rola"><small class="muted">🎲 ${esc(m.texto || 'Rolagem')}</small>${linhas}<div class="n">${x.total != null ? x.total : ''}</div></div>`;
+}
+
+function pintarBarraSala() {
+  const el = $('#chat-barra'); if (!el) return;
+  const D = S.rpgDados; const aberto = D.msgs.find(ehMeuPedidoSala);
+  const sig = (aberto ? aberto.id : '') + '|' + (D.mestre ? 'm' : 'j') + '|' + S.rpgSala;
+  if (S.barraSig === sig) return; S.barraSig = sig;
+  if (D.sala.status === 'pausado') { el.innerHTML = '<p class="muted" style="margin:0;padding:6px">Aventura pausada.</p>'; return; }
+  if (D.mestre) {
+    el.innerHTML = `<input class="in" id="msg-mestre" type="text" maxlength="1000" placeholder="Fale como mestre…" aria-label="Mensagem do mestre">
+      <button class="btn" data-act="rpg-enviar-mestre">Enviar</button>
+      <button class="btn-grav" data-act="rpg-gravar" title="Gravar áudio (até 25s)">🎙</button>`;
+  } else {
+    const podeAgir = mestreFalouPorUltimo() && !temPedidoAbertoParaMim() && !temAcaoPendenteMinha();
+    const p = rpgMinhaPers();
+    if (!p || p.status !== 'aprovado') { el.innerHTML = '<p class="muted" style="margin:0;padding:6px">Seu personagem ainda não foi aprovado.</p>'; return; }
+    el.innerHTML = (aberto ? `<button class="btn-eu" data-act="rpg-rolar" data-id="${aberto.id}">🎲 Jogar dados</button>` : '') +
+      `<button class="btn-eu" data-act="rpg-eu" ${podeAgir ? '' : 'disabled'} title="${podeAgir ? '' : 'Espere o mestre falar'}">EU</button>`;
+  }
+}
+
+function pintarPainelSala() {
+  const el = $('#rpg-painel'); if (!el) return;
+  const D = S.rpgDados;
+  el.innerHTML = `<div class="row" style="justify-content:space-between"><h2 style="font-size:20px">Personagens</h2><button class="btn mini" data-act="rpg-montar">+ Montar</button></div>` +
+    (D.personagens.length ? D.personagens.map((c) => {
+      const U = D.universo_dados;
+      const raca = (U.racas.find((r) => r[0] === c.raca) || [])[1] || c.raca;
+      const classe = (U.classes.find((k) => k[0] === c.classe) || [])[1] || c.classe;
+      const dono = (D.membros.find((m) => m.id === c.dono_id) || {}).nome || '—';
+      const atrs = (c.atributos || []).map((a) => { const def = S.rpgAtributos.find((x) => x[0] === a.k); return `<span>${esc(def ? def[1] : a.k)} ${a.v}</span>`; }).join('');
+      const botoes = c.status === 'enviado' ? `<div class="row"><button class="btn mini" data-act="rpg-aprovar" data-id="${c.id}">Aprovar</button><button class="btn perigo mini" data-act="rpg-rejeitar" data-id="${c.id}">Rejeitar</button></div>` : `<span class="tag-estado ${c.status}">${c.status}</span>`;
+      return `<article class="card ficha-mini"><header><div><h3>${esc(c.nome)}</h3><span class="muted">${esc(raca)} · ${esc(classe)} · ${esc(dono)}</span></div>${botoes}</header><div class="attrs-mini">${atrs}</div></article>`;
+    }).join('') : '<div class="vazio">Nenhum personagem ainda.</div>');
+}
+
+function formConvidar() {
+  const D = S.rpgDados;
+  const ids = D.membros.map((m) => m.id);
+  const cand = S.pessoas.filter((p) => ids.indexOf(p.id) < 0);
+  const lista = cand.map((p) => `<label class="check"><input type="checkbox" name="j" value="${p.id}"> ${esc(p.nome)}</label>`).join('');
+  abrirModal('Convidar jogadores', `<div class="campo"><span class="rot">Quem você quer convidar?</span>${lista || '<p class="muted">Todo mundo já está no RPG.</p>'}</div>`, { onSubmit: async (f) => {
+    const escolhidos = [...f.querySelectorAll('input[name=j]:checked')].map((i) => i.value);
+    if (!escolhidos.length) throw new Error('Escolha pelo menos uma pessoa.');
+    await chamar('rpgConvidar', { jogadores: escolhidos });
+    fecharModal(); await recarregarSala(); aviso('Convites enviados');
+  } });
+}
+
+function formPedirDado(refId) {
+  const D = S.rpgDados;
+  const jogadores = D.membros.filter((m) => (D.personagens || []).some((c) => c.dono_id === m.id && c.status === 'aprovado'));
+  const opcoes = jogadores.map((p) => `<option value="${p.id}">${esc(p.nome)}</option>`).join('');
+  const refMsg = refId ? D.msgs.find((m) => m.id === refId) : null;
+  const linhas = `<div class="rolagem-item"><select name="lados">${RPG_DADOS.map((d) => `<option value="${d}">d${d}</option>`).join('')}</select><input type="number" name="qtd" value="1" min="1" max="20"><button type="button" class="btn sec mini" data-act="rpg-add-dado">+ Adicionar</button></div>`;
+  abrirModal('Pedir um dado', `<div class="campo"><label for="pd_alvo">Quem vai rolar?</label><select id="pd_alvo" name="alvo">${opcoes || '<option value="">Nenhum personagem aprovado</option>'}</select></div>
+    ${refMsg ? `<div class="campo"><span class="rot">Pedido sobre a ação de</span><div class="aviso-inline">${esc(refMsg.autor)}: ${esc(refMsg.texto || '(áudio)')}</div></div>` : ''}
+    <div class="campo"><span class="rot">Dados</span><div id="pd_lista">${linhas}</div></div>
+    <div class="campo"><label for="pd_motivo">Motivo (opcional)</label><input id="pd_motivo" type="text" name="motivo" maxlength="120"></div>`, { onSubmit: async (f) => {
+    const dados = [...f.querySelectorAll('.rolagem-item')].map((r) => ({ lados: Number(r.querySelector('[name=lados]').value), qtd: Number(r.querySelector('[name=qtd]').value) }));
+    await chamar('rpgPedirDado', { para_user_id: f.alvo.value, dados, ref_id: refId || '', motivo: f.motivo.value });
+    fecharModal(); await recarregarSala();
+  } });
+}
+
+function formMontar(donoFixo, eConvidar) {
+  const D = S.rpgDados; const U = D.universo_dados; const atrs = D.sala.atributos;
+  const jogadores = D.membros.filter((m) => m.papel === 'jogador' && (m.convite === 'aceito' || m.convite === 'pendente' || m.convite === 'saiu'));
+  const donoOp = jogadores.map((p) => `<option value="${p.id}" ${p.id === donoFixo ? 'selected' : ''}>${esc(p.nome)}</option>`).join('');
+  S.montar = { valores: atrs.map(() => 1), convidar: !!eConvidar };
+  const raca = U.racas.map((r) => `<option value="${r[0]}">${esc(r[1])}</option>`).join('');
+  const classe = U.classes.map((k) => `<option value="${k[0]}">${esc(k[1])}</option>`).join('');
+  const linhas = atrs.map((a, i) => `<div class="attr-item"><div><b>${esc(a[1])}</b><small>${esc(a[2])}</small></div><div class="pts-barra"><button type="button" class="btn sec mini" data-act="rpg-mp" data-i="${i}">−</button><span class="val" id="mp_a${i}">1</span><button type="button" class="btn mini" data-act="rpg-mp" data-i="${i}" data-mais="1">+</button></div></div>`).join('');
+  abrirModal('Montar personagem', `<div class="campo"><label for="mp_dono">Dono</label><select id="mp_dono" name="dono">${donoOp}</select></div>
+    <div class="campo"><label for="mp_nome">Nome</label><input id="mp_nome" type="text" name="nome" maxlength="40"></div>
+    <div class="campo"><label for="mp_raca">Raça</label><select id="mp_raca" name="raca">${raca}</select></div>
+    <div class="campo"><label for="mp_classe">Classe</label><select id="mp_classe" name="classe">${classe}</select></div>
+    <div class="campo"><span class="rot">Atributos</span><div class="attr-lista" id="mp_attrs">${linhas}</div><div class="aviso-inline" id="mp_pontos"></div></div>`, { larga: true, salvar: eConvidar ? 'Salvar e convidar' : 'Enviar para o jogador', onSubmit: async (f) => {
+    const valores = atrs.map((a, i) => ({ k: a[0], v: S.montar.valores[i] }));
+    const personagem = { dono_id: f.dono.value, nome: f.nome.value, raca: f.raca.value, classe: f.classe.value, atributos: valores };
+    if (S.montar.convidar) await chamar('rpgMontarEConvidar', { personagem });
+    else await chamar('rpgMontarPersonagem', { personagem });
+    fecharModal(); await recarregarSala();
+  } });
+  setTimeout(atualizarMontar, 0);
+}
+
+function atualizarMontar() {
+  if (!S.montar || !$('#mp_attrs')) return;
+  const n = S.rpgDados.sala.atributos.length; const extra = n - 1;
+  const usado = S.montar.valores.reduce((s, v) => s + v - 1, 0); const sobra = extra - usado;
+  $('#mp_pontos').textContent = sobra > 0 ? 'Sobram ' + sobra : sobra < 0 ? 'Passou dos pontos' : 'Tudo distribuído.';
+  S.montar.valores.forEach((v, i) => {
+    const el = $('#mp_a' + i); if (el) el.textContent = v;
+    const menos = document.querySelector('[data-act=rpg-mp][data-i="' + i + '"]:not([data-mais])');
+    const mais = document.querySelector('[data-act=rpg-mp][data-i="' + i + '"][data-mais]');
+    if (menos) menos.disabled = v <= 1; if (mais) mais.disabled = sobra <= 0;
+  });
+}
+
+let REC = null, REC_CHUNKS = [], REC_T0 = 0, REC_TIMER = null, REC_CB = null;
+async function comecarGravacao(cb) {
+  if (REC) return;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : '';
+    REC = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    REC_CHUNKS = []; REC_T0 = Date.now();
+    REC.ondataavailable = (e) => { if (e.data.size) REC_CHUNKS.push(e.data); };
+    REC.onstop = async () => {
+      const ms = Date.now() - REC_T0;
+      stream.getTracks().forEach((t) => t.stop());
+      clearInterval(REC_TIMER);
+      const blob = new Blob(REC_CHUNKS, { type: REC.mimeType || 'audio/webm' });
+      REC = null; REC_CHUNKS = [];
+      if (ms < 400) { aviso('Muito curto. Tente de novo.', true); return; }
+      const b64 = await blobParaB64(blob);
+      if (REC_CB) REC_CB({ mime: blob.type, b64 });
+    };
+    REC.start();
+    if (cb) cb();
+  } catch (e) { aviso('Não consegui acessar o microfone.', true); }
+}
+function pararGravacao() { if (REC && REC.state !== 'inactive') REC.stop(); }
+function limparGravacao() { if (REC && REC.state !== 'inactive') REC.stop(); if (REC_TIMER) clearInterval(REC_TIMER); REC_TIMER = null; }
+function blobParaB64(blob) {
+  return new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).split(',')[1] || ''); fr.onerror = bad; fr.readAsDataURL(blob); });
+}
+
+async function tocarAudio(id, el) {
+  try {
+    const r = await chamar('rpgAudio', { audio_id: id });
+    el.src = 'data:' + r.mime + ';base64,' + r.b64; el.play();
+  } catch (e) { aviso(e.message, true); }
+}
+
+function formEu() {
+  const p = rpgMinhaPers(); if (!p) return;
+  S.euAudio = null;
+  abrirModal('O que ' + p.nome + ' faz?', `<div class="campo"><label for="eu_txt">Escreva sua ação</label><textarea id="eu_txt" name="texto" maxlength="500"></textarea></div>
+    <div class="campo"><span class="rot">Ou grave um áudio (até 25s)</span><div class="row"><button type="button" class="btn sec" data-act="rpg-gravar-acao" id="eu_grav">🎙 Gravar</button><span id="eu_grav_info" class="muted"></span></div></div>`,
+  { salvar: 'Enviar ação', onSubmit: async (f) => {
+    const texto = f.texto.value.trim();
+    if (!texto && !S.euAudio) throw new Error('Escreva ou grave alguma coisa.');
+    await chamar('rpgEnviarMensagem', { texto, audio: S.euAudio || null });
+    S.euAudio = null; fecharModal(); await recarregarSala();
+  } });
+}
+
+function formNarrar(refId) {
+  abrirModal('Narrar', `<div class="campo"><label for="nr_txt">O que acontece?</label><textarea id="nr_txt" name="texto" maxlength="1500"></textarea></div>`, { salvar: 'Narrar', onSubmit: async (f) => {
+    const texto = f.texto.value.trim();
+    if (!texto) throw new Error('Escreva a narração.');
+    await chamar('rpgNarrar', { texto, ref_id: refId || '' });
+    fecharModal(); await recarregarSala();
+  } });
+}
+
+function formComoJogar() {
+  abrirModal('Como jogar', `<ol style="padding-left:22px;display:grid;gap:8px">
+    <li><b>Criar.</b> Novo RPG → escolha as pessoas, o universo e os atributos → <b>Enviar</b> (manda os convites) ou <b>Criar personagens</b> (monta o personagem de cada um e convida).</li>
+    <li><b>Personagens.</b> Cada jogador pode criar o próprio personagem, ou o mestre monta e envia para o jogador aprovar.</li>
+    <li><b>Jogar.</b> Na mesa, o mestre fala e o jogador toca em <b>EU</b> para descrever a ação (texto ou áudio).</li>
+    <li><b>Dados.</b> O mestre escolhe quem rola e quais dados; só o escolhido rola.</li>
+    <li><b>Sair/Pausar.</b> O mestre sai e a mesa fica pausada; ele volta quando quiser. O jogador sai e pode voltar pelo quadro.</li>
+  </ol>`, { somenteLer: true, semFoco: true });
+}
+
+document.addEventListener('click', async (ev) => {
+  const t = ev.target.closest('[data-act]'); if (!t) return;
+  const act = t.dataset.act;
+  try {
+    if (act === 'fechar') return fecharModal();
+    if (act === 'aba') { S.aba = t.dataset.aba; S.rpgSala = null; S.rpgDados = null; S.feedSig = ''; S.barraSig = ''; render(); return; }
+    if (act === 'conta') { formConta(); return; }
+    if (act === 'novo') { formItem(t.dataset.mod); return; }
+    if (act === 'abrir') { abrirItem(t.dataset.mod, t.dataset.id); return; }
+    if (act === 'filtro') { S.filtroT = t.dataset.f; $('#view').innerHTML = viewTarefas(); return; }
+    if (act === 'mes') { S.mes.m += Number(t.dataset.d); if (S.mes.m < 0) { S.mes.m = 11; S.mes.y--; } if (S.mes.m > 11) { S.mes.m = 0; S.mes.y++; } $('#view').innerHTML = viewAgenda(); return; }
+    if (act === 'dia') { S.dia = t.dataset.d; $('#view').innerHTML = viewAgenda(); return; }
+    if (act === 'mover') { const it = (S.dados.tarefas || []).find((x) => x.id === t.dataset.id); if (!it) return;
+      const ord = ['a_fazer', 'fazendo', 'feito']; const i = ord.indexOf(it.status) + Number(t.dataset.d);
+      await chamar('salvar', { mod: 'tarefas', item: { id: it.id, status: ord[i] } }); await recarregar(); return; }
+    if (act === 'excluir') { if (!confirm('Excluir?')) return; await chamar('excluir', { mod: t.dataset.mod, id: t.dataset.id }); fecharModal(); await recarregar(); return; }
+    if (act === 'nova-pessoa') { formPessoa(); return; }
+    if (act === 'editar-pessoa') { formPessoa(S.usuariosAdmin.find((u) => u.id === t.dataset.id)); return; }
+    if (act === 'excluir-pessoa') { if (!confirm('Excluir essa pessoa?')) return; await chamar('excluirUsuario', { id: t.dataset.id }); fecharModal(); await recarregar(); return; }
+    if (act === 'ver-senha') { const b = t.previousElementSibling; if (!b) return; const oc = b.dataset.oculta === '1'; b.textContent = oc ? (b.dataset.senha || '') : '••••••'; b.dataset.oculta = oc ? '0' : '1'; t.textContent = oc ? 'Esconder' : 'Ver'; return; }
+    if (act === 'preset') { const f = $('#mf'); AREAS.forEach((a) => { const s = f.elements['p_' + a[0]]; if (s) s.value = t.dataset.p; }); return; }
+    if (act === 'rpg-novo') { formNovoRpg(); return; }
+    if (act === 'rpg-univ') { S.novoRpg.universo = t.dataset.id; atualizarNovoRpg(); return; }
+    if (act === 'rpg-attr') { const k = t.dataset.id; const i = S.novoRpg.atributos.indexOf(k);
+      if (i < 0) S.novoRpg.atributos.push(k); else S.novoRpg.atributos.splice(i, 1); atualizarNovoRpg(); return; }
+    if (act === 'rpg-enviar') { await enviarNovoRpg(); return; }
+    if (act === 'rpg-criar-pers') { await criarPersonagensNovoRpg(); return; }
+    if (act === 'rpg-abrir') { await abrirSala(t.dataset.id); return; }
+    if (act === 'rpg-voltar') { S.rpgSala = null; S.rpgDados = null; S.feedSig = ''; S.barraSig = ''; render(); return; }
+    if (act === 'rpg-aceitar') { await chamar('rpgResponderConvite', { aceito: true }); await recarregarSala(); return; }
+    if (act === 'rpg-recusar') { await chamar('rpgResponderConvite', { aceito: false }); await recarregarSala(); return; }
+    if (act === 'rpg-pm') { const i = Number(t.dataset.i); if (t.dataset.mais) S.criar.valores[i]++; else S.criar.valores[i] = Math.max(1, S.criar.valores[i] - 1); atualizarCriarPers(); return; }
+    if (act === 'rpg-mp') { const i = Number(t.dataset.i); if (t.dataset.mais) S.montar.valores[i]++; else S.montar.valores[i] = Math.max(1, S.montar.valores[i] - 1); atualizarMontar(); return; }
+    if (act === 'rpg-enviar-pers') {
+      const nome = ($('#cr_nome') || {}).value || '';
+      const raca = ($('#cr_raca input:checked') || {}).value;
+      const classe = ($('#cr_classe input:checked') || {}).value;
+      const atrs = S.rpgDados.sala.atributos.map((a, i) => ({ k: a[0], v: S.criar.valores[i] }));
+      await chamar('rpgEnviarPersonagem', { personagem: { nome, raca, classe, atributos: atrs } });
+      await recarregarSala(); aviso('Enviado para o mestre'); return; }
+    if (act === 'rpg-editar-pers') { await recarregarSala(); return; }
+    if (act === 'rpg-pausar') {
+      const D = S.rpgDados;
+      if (D.sala.status === 'pausado') { await chamar('rpgRetomar'); await recarregarSala(); return; }
+      if (D.mestre) { if (!confirm('Sair? A aventura fica pausada para todos.')) return; await chamar('rpgPausar'); await recarregarSala(); return; }
+      if (!confirm('Sair da mesa? O RPG continua para os outros.')) return;
+      await chamar('rpgPausar'); S.rpgSala = null; S.rpgDados = null; render(); return; }
+    if (act === 'rpg-convidar') { formConvidar(); return; }
+    if (act === 'rpg-eu') { formEu(); return; }
+    if (act === 'rpg-enviar-mestre') {
+      const el = $('#msg-mestre'); const texto = el ? el.value.trim() : '';
+      if (!texto) return;
+      await chamar('rpgEnviarMensagem', { texto }); el.value = ''; await recarregarSala(); return; }
+    if (act === 'rpg-gravar') {
+      if (REC) { pararGravacao(); t.classList.remove('gravando'); t.textContent = '🎙'; return; }
+      REC_CB = async (audio) => { await chamar('rpgEnviarMensagem', { texto: '', audio }); await recarregarSala(); };
+      await comecarGravacao(() => { t.classList.add('gravando'); t.textContent = '⏹'; setTimeout(() => { if (REC) { pararGravacao(); t.classList.remove('gravando'); t.textContent = '🎙'; } }, 25000); });
+      return; }
+    if (act === 'rpg-gravar-acao') {
+      if (REC) { pararGravacao(); t.classList.remove('gravando'); t.textContent = '🎙 Gravar'; return; }
+      REC_CB = (audio) => { S.euAudio = audio; const el = $('#eu_grav_info'); if (el) el.textContent = 'Áudio gravado ✔'; };
+      await comecarGravacao(() => { t.classList.add('gravando'); t.textContent = '⏹ Parar'; setTimeout(() => { if (REC) { pararGravacao(); t.classList.remove('gravando'); t.textContent = '🎙 Gravar'; } }, 25000); });
+      return; }
+    if (act === 'rpg-pedir-dado') { formPedirDado(t.dataset.id); return; }
+    if (act === 'rpg-add-dado') { const box = $('#pd_lista'); const r = box.lastElementChild.cloneNode(true); r.querySelector('[name=qtd]').value = '1'; box.appendChild(r); return; }
+    if (act === 'rpg-rolar') { await chamar('rpgRolarDado', { pedido_id: t.dataset.id }); await recarregarSala(); return; }
+    if (act === 'rpg-narrar') { formNarrar(t.dataset.id); return; }
+    if (act === 'rpg-montar') { formMontar(); return; }
+    if (act === 'rpg-aprovar') { await chamar('rpgAprovarPersonagem', { id: t.dataset.id }); await recarregarSala(); return; }
+    if (act === 'rpg-rejeitar') { const obs = prompt('O que o jogador precisa mudar?') || ''; await chamar('rpgRejeitarPersonagem', { id: t.dataset.id, obs }); await recarregarSala(); return; }
+    if (act === 'rpg-como') { formComoJogar(); return; }
+    if (act === 'rpg-audio') { tocarAudio(t.dataset.audio, t); return; }
+  } catch (e) {
+    if (expirou(e.message)) return sair(true);
+    aviso(e.message, true);
+  }
+});
+
+document.addEventListener('click', (ev) => {
+  const a = ev.target.closest('[data-audio]'); if (!a) return;
+  if (a.tagName === 'AUDIO' && !a.src) tocarAudio(a.dataset.audio, a);
+});
+
+function formConta() {
+  abrirModal('Minha conta', `<div class="campo"><span class="rot">Nome</span><div>${esc(S.eu.nome)}</div></div>
+    <div class="campo"><span class="rot">Usuário</span><div>@${esc(S.eu.usuario)}</div></div>
+    <div class="campo"><label for="ct_atual">Senha atual</label><input id="ct_atual" type="password" name="atual"></div>
+    <div class="campo"><label for="ct_nova">Nova senha</label><input id="ct_nova" type="password" name="nova"></div>`,
+  { salvar: 'Trocar senha', onSubmit: async (f) => { await chamar('trocarSenha', { atual: f.atual.value, nova: f.nova.value }); fecharModal(); aviso('Senha alterada'); } });
+}
+
+/* ============ início ============ */
+iniciar();
+</script>
+</body>
+</html>
